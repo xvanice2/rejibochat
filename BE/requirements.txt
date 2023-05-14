@@ -3,3 +3,7 @@ uvicorn[standard]
 python-dotenv
 langchain
 openai
+pydantic
+ultralytics
+torch 
+torchvision
