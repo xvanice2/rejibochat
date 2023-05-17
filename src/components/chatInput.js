@@ -5,13 +5,15 @@ import Button from "@material-ui/core/Button";
 
 const useStyles = makeStyles((theme) => ({
   container: {
-    position: "fixed",
     bottom: 0,
     left: 0,
-    width: "100%",
+    width: "35%",
+    borderRadius: "4px",
+    marginBottom: "15px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    margin: "auto",
     backgroundColor: "#f5f5f5",
     padding: theme.spacing(2),
     borderTop: "1px solid #e0e0e0",

@@ -1,8 +1,8 @@
 from typing import Union
 from dotenv import load_dotenv
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 import os
-from ultralytics import YOLO
 
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import ConversationChain # 
@@ -10,17 +10,20 @@ from langchain.memory import ConversationEntityMemory #neudrzuje si celu pamat a
 from langchain.memory.prompt import ENTITY_MEMORY_CONVERSATION_TEMPLATE #
 from pydantic import BaseModel
 
-# Load a model
-# model = YOLO("yolov8n.pt")  # load a pretrained model
-model = YOLO("yolov8n-cls.pt")  # load a pretrained model for classification
-
-
 class Message(BaseModel):
     text: str
 
-
-
+origins = [
+    "http://localhost:3000",
+]
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 load_dotenv()
 API_KEY = os.getenv('OPENAI_API_KEY')
 
@@ -45,40 +48,10 @@ print("Hello, I am ChatGPT Rejibo")
 def read_root():
     return "Hello, I am ChatGPT Rejibo"
 
-
 @app.post("/message")
 async def index(message: Message):
     ai_response = conversation.predict(input=message.text)
     return ai_response
-
-@app.get("/predict")
-async def predict(url: str):
-    results = model(url)  # predict based on image url from query param
-
-    if len(results) == 0:
-        return {
-            "message": "no objects detected"
-        }
-
-    result = results[0]  # get the first result
-    named_results = []
-    i = 0
-
-    for name in result.names.values():
-        named_results.append({
-            "name": name,
-            "confidence": result.probs[i].item()
-        })
-        i += 1
-
-    # filter out results with confidence less than 0.5
-    filtered_results = [r for r in named_results if r["confidence"] > 0.5]
-
-
-    return {
-        "message": "success",
-        "results": filtered_results
-    }
 
 #Main method
 if __name__=='__main__':

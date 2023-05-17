@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Chatbot() {
+function Chatbot({ responseMessage, sendMessage }) {
   const classes = useStyles();
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState("");
@@ -35,22 +35,21 @@ function Chatbot() {
     chatContainer.scrollTop = chatContainer.scrollHeight;
   }, [messages]);
 
+  useEffect(() => {
+    // Add bot response to the chat
+    if (responseMessage !== "") {
+      setMessages((messages) => [
+        ...messages,
+        { sender: "bot", text: responseMessage },
+      ]);
+    }
+  }, [responseMessage]);
+
   const handleNewMessage = (message) => {
     // Add user message to the chat
     setMessages((messages) => [...messages, { sender: "user", text: message }]);
 
-    // Generate bot response
-    const responses = [
-      "I'm sorry, I didn't understand that.",
-      "Can you please rephrase that?",
-      "That's interesting. Tell me more.",
-      "I'm not sure I agree with that.",
-    ];
-    const randomIndex = Math.floor(Math.random() * responses.length);
-    const response = responses[randomIndex];
-
-    // Add bot response to the chat
-    setMessages((messages) => [...messages, { sender: "bot", text: response }]);
+    sendMessage(message);
   };
 
   const handleInputChange = (event) => {
@@ -72,6 +71,9 @@ function Chatbot() {
         elevation={3}
         className={classes.chatContainer}
         id="chat-container"
+        style={{
+          margin: "15px",
+        }}
       >
         <ChatHistory messages={messages} />
         <div style={{ clear: "both" }}></div>
